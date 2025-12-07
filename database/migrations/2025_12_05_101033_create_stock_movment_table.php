@@ -17,8 +17,7 @@ return new class extends Migration
         Schema::create('stock_movment', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(Product::class)->constrained()->onDelete('cascade');
-            $table->foreignIdFor(Order::class)->nullable()->constrained()->onDelete('cascade');
-            $table->foreignIdFor(SupplierOrder::class)->nullable()->constrained()->onDelete('cascade');
+            $table->unsignedBigInteger('related_id')->nullable(); // order id or supplier order id
             $table->enum('type', ['in', 'out']); // supplier in, customer out
             $table->boolean('return')->default(false);
             $table->integer('quantity');
