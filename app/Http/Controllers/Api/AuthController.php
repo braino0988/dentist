@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\UserResource;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -15,6 +16,10 @@ use Illuminate\Support\Facades\Log as Log;
 class AuthController extends Controller
 {
     use AuthorizesRequests;
+    public function index(){
+        $this->authorize('browseUsers',User::class);
+        return UserResource::collection(User::all());
+    }
     public function register(Request $request)
     {
         $atts = $request->validate([
@@ -52,10 +57,10 @@ class AuthController extends Controller
             'password'=>'string|required|confirmed',
             'is_employee'=>'boolean|required_with:roles',
             'roles'=>'array',
-            'roles.*'=>'string|exists:roles,name'
+            'roles.*'=>'string|exists:roles,type'
         ]);
         Log::error($request->user()->roles()->get());
-        $this->authorize('createUser',Role::class);
+        $this->authorize('createUser',User::class);
         Log::info('Employee Data Before Insert:', ['employeeData' => [
             'name' => $atts['name'],
             'email' => $atts['email'],
@@ -79,7 +84,7 @@ class AuthController extends Controller
         }
         return response()->json([
             'message' => 'Employee user created successfully',
-            'user' => $user
+            'user' => UserResource::make($user)
         ], 201);
 
 

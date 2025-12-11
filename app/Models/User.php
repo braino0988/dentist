@@ -56,7 +56,6 @@ class User extends Authenticatable implements \Illuminate\Contracts\Auth\MustVer
         return $this->belongsToMany(Role::class, 'role_user', 'user_id', 'role_id');
     }
     public function isAdmin(){
-        Log::alert('asd',$this->roles()->get());
         return $this->is_employee && $this->roles()->where('type','admin')->exists();
     }
     public function isEmployee(){
@@ -76,7 +75,7 @@ class User extends Authenticatable implements \Illuminate\Contracts\Auth\MustVer
     }
     public function assignRoles(array $roles)
     {
-        $roleIds = Role::whereIn('name', $roles)->pluck('id')->toArray();
+        $roleIds = Role::whereIn('type', $roles)->pluck('id')->toArray();
         $this->roles()->sync($roleIds);
     }
 }
