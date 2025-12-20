@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Category;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -21,7 +22,7 @@ class DatabaseSeeder extends Seeder
 
         User::factory()->create([
             'name' => 'admin',
-            'email' => 'test@example.com',
+            'email' => 'admin@dentalhub.com',
             'is_employee' => true,
             'password' => env('ADM_PAS'), // password
         ]);
@@ -43,6 +44,11 @@ class DatabaseSeeder extends Seeder
         DB::table('role_user')->insert([
             'role_id' => 1,
             'user_id' => 1,
+        ]);
+        Category::factory()->create([
+            'name' => 'other',
+            's_name' => 'other',
+            'enabled' => true,
         ]);
     }
 }

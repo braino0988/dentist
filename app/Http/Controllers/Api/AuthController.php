@@ -16,9 +16,15 @@ use Illuminate\Support\Facades\Log as Log;
 class AuthController extends Controller
 {
     use AuthorizesRequests;
-    public function index(){
+    public function indexCustomers(){
         $this->authorize('browseUsers',User::class);
-        return UserResource::collection(User::all());
+        $customers=User::where('is_employee',0)->get();
+        return UserResource::collection($customers);
+    }
+    public function indexEmployees(){
+        $this->authorize('browseUsers', User::class);
+        $employees = User::where('is_employee', 1)->get();
+        return UserResource::collection($employees);
     }
     public function register(Request $request)
     {

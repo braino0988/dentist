@@ -30,4 +30,19 @@ class UserPolicy
         Log::error('hi from policy - create category');
         return $user->isAdmin() || $user->isInventory();
     }
+    public function updateCategory(User $user): bool
+    {
+        Log::error('hi from policy - update category');
+        return $user->isAdmin() || $user->isInventory();
+    }
+    public function createProduct(User $user): bool
+    {
+        Log::error('hi from policy - create product');
+        return $user->isAdmin() || $user->isInventory();
+    }
+    public function viewAnyOrder(User $user): bool
+    {
+        Log::error('hi from policy - viewAnyOrder');
+        return $user->isAdmin() || $user->isInventory();
+    }
 }

@@ -16,7 +16,7 @@ return new class extends Migration
         Schema::create('payments', function (Blueprint $table) {
             $table->id();
             $table->enum('payable_type',['order','supplier_order']);
-            $table->unsignedBigInteger('payable_id');
+            $table->unsignedBigInteger('payable_id');//postgre
             $table->enum('payment_type',['incoming','outgoing']);
             $table->enum('payer_type',['customer','supplier']);
             $table->unsignedBigInteger('payer_id');

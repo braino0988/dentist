@@ -14,7 +14,7 @@ class CategoryController extends Controller
     use AuthorizesRequests;
     public function index()
     {
-        //
+        return response()->json(['data'=>Category::all()],200);
     }
     public function show($id)
     {
@@ -23,8 +23,8 @@ class CategoryController extends Controller
     public function store(Request $request)
     {
         $atts=$request->validate([
-            'name'=>'required|string|max:255',
-            's_name'=>'required|string|max:50',
+            'name'=>'required_without:s_name|string|max:255',
+            's_name'=>'required_without:name|string|max:50',
             'enabled'=> 'nullable|boolean',
         ]);
         $this->authorize('createCategory',User::class);
@@ -37,5 +37,28 @@ class CategoryController extends Controller
             'message'=>'Category created successfully',
             'category'=>$category,
         ],201);
+    }
+    public function updateState(Request $request, $id)
+    {
+        $this->authorize('updateCategory',User::class);
+        $category=Category::findOrFail($id);
+        $atts=$request->validate([
+            'enabled'=>'required|boolean',
+        ]);
+        $category->enabled=$atts['enabled'];
+        $category->save();
+        return response()->json([
+            'message'=>'Category state updated successfully',
+            'category'=>$category,
+        ],200);
+    }
+    public function destroy($id)
+    {
+        $this->authorize('updateCategory',User::class);
+        $category=Category::findOrFail($id);
+        $category->delete();
+        return response()->json([
+            'message'=>'Category deleted successfully',
+        ],200);
     }
 }

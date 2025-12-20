@@ -21,7 +21,7 @@ return new class extends Migration
             $table->decimal('tax_amount', 10, 2);
             $table->decimal('total_amount', 10, 2);
             $table->date('due_date')->nullable();
-            $table->string('payment_status')->default('unpaid');
+            $table->string('payment_status')->default('pending'); //paid, pending , over due
             $table->timestamps();
         });
     }

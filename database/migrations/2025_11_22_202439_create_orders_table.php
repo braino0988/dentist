@@ -21,7 +21,7 @@ return new class extends Migration
             $table->string('currency', 3)->default('SEK');
             $table->string('payment_method')->nullable();
             $table->date('order_date');
-            $table->string('status')->default('pending');
+            $table->string('status')->default('pending');//pendening , completed, cancelled, processing ,,shipped
             $table->text('notes')->nullable();
             $table->timestamps();
         });
