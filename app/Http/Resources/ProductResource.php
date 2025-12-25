@@ -14,29 +14,21 @@ class ProductResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        $lan=$request->get('lan','en');
-        if($lan=='sw'){
             return [
                 'name' => $this->s_name,
+                'sku'=>$this->sku,
                 'description' => $this->s_description,
                 'price' => $this->price,
                 'stock_quantity' => $this->stock_quantity,
                 'category' => $this->category->s_name,
                 'delivery_option' => $this->delivery_option,
-                'price_after_discount' => $this->price_after_discount,
+                'tax_rate'=> $this->tax_rate,
+                'discount_rate' => $this->discount_rate,
+                'product_rate' => $this->product_rate,
+                'status' => $this->status,
+                'images' => ImageResource::collection($this->whenLoaded('images')),
                 'created_at' => $this->created_at
             ];
-        }else{
-        return [
-            'name' => $this->name,
-            'description' => $this->description,
-                'price' => $this->price,
-                'stock_quantity' => $this->stock_quantity,
-                'category' => $this->category->name,
-                'delivery_option' => $this->delivery_option,
-                'price_after_discount' => $this->price_after_discount,
-                'created_at' => $this->created_at
-        ];
         }
     }
-}
+

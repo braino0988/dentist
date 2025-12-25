@@ -18,6 +18,7 @@ class ProductFactory extends Factory
     {
         return [
             'name' => fake()->word(),
+            'sku'=>fake()->unique()->bothify('SKU-#####??'),
             'description' => fake()->sentence(),
             's_name'=>fake()->word(),
             's_description'=>fake()->sentence(),
@@ -25,7 +26,10 @@ class ProductFactory extends Factory
             'stock_quantity' => fake()->numberBetween(0, 100),
             'category_id' => \App\Models\Category::factory(),
             'delivery_option' => fake()->word(),
-            'price_after_discount' => null,
+            'product_rate' => fake()->randomFloat(1, 0, 5),
+            'status' => 'instock',
+            'tax_rate' => fake()->randomFloat(2, 0, 0.25),
+            'discount_rate' => null,
         ];
     }
 }

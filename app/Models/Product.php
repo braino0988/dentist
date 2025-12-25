@@ -4,11 +4,14 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Log;
 
 class Product extends Model
 {
     use HasFactory;
+    protected $guarded = [];
     public function orders(){
+        Log::error('ay you');
         return $this->belongsToMany(Order::class,'order_product')->withPivot('quantity', 'unit_price', 'tax_rate', 'tax_amount')->withTimestamps();
     }
     public function images(){

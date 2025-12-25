@@ -14,15 +14,23 @@ return new class extends Migration
     {
         Schema::create('products', function (Blueprint $table) {
             $table->id();
+            //stock keeping unit
+            $table->string('sku')->unique();
+            $table->foreignIdFor(Category::class)->constrained()->onDelete('cascade');
             $table->string('name');
             $table->string('s_name');
             $table->text('description')->nullable();
             $table->text('s_description')->nullable();
             $table->decimal('price', 8, 2);
+            $table->decimal('cost', 8, 2)->nullable();
+            $table->decimal('tax_rate', 5, 2)->min(0)->max(100.0)->default(0);
             $table->integer('stock_quantity')->default(0);
-            $table->foreignIdFor(Category::class)->constrained()->onDelete('cascade');
+            $table->string('unit')->nullable();
+            $table->string('status')->default('instock'); //instock, outofstock, alertstock
+            $table->decimal('product_rate',2,1)->min(0)->max(5.0)->default(0);
             $table->string('delivery_option')->nullable();
-            $table->decimal('price_after_discount', 8, 2)->nullable();
+            //restrict this to be max 100
+            $table->decimal('discount_rate', 5, 2)->min(0)->max(100.0)->nullable();
             $table->timestamps();
         });
     }

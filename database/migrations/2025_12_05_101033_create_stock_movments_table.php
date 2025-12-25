@@ -14,13 +14,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('stock_movment', function (Blueprint $table) {
+        Schema::create('stock_movments', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(Product::class)->constrained()->onDelete('cascade');
+            $table->string('related_type'); // 'order' or 'supplier_order'
             $table->unsignedBigInteger('related_id')->nullable(); // order id or supplier order id
             $table->enum('type', ['in', 'out']); // supplier in, customer out
             $table->boolean('return')->default(false);
-            $table->integer('quantity');
+            $table->integer('quantity_ordered');
+            $table->integer('quantity_in_stock');
             $table->string('notes')->nullable(); // in case costumer or supplier canceled
             $table->timestamps();
         });
@@ -31,6 +33,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('stock_movment');
+        Schema::dropIfExists('stock_movments');
     }
 };

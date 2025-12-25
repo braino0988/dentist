@@ -45,4 +45,15 @@ class UserPolicy
         Log::error('hi from policy - viewAnyOrder');
         return $user->isAdmin() || $user->isInventory();
     }
+    public function createOrder(User $user): bool
+    {
+        Log::error('hi from policy - createOrder');
+        //what to do here?
+        return true;
+    }
+    public function updateOrder(User $user): bool
+    {
+        Log::error('hi from policy - updateOrder');
+        return $user->isAdmin() || $user->isInventory();
+    }
 }
