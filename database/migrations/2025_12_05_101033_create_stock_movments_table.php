@@ -21,7 +21,7 @@ return new class extends Migration
             $table->unsignedBigInteger('related_id')->nullable(); // order id or supplier order id
             $table->enum('type', ['in', 'out']); // supplier in, customer out
             $table->boolean('return')->default(false);
-            $table->integer('quantity_ordered');
+            $table->integer('quantity_ordered')->min(0);
             $table->integer('quantity_in_stock');
             $table->string('notes')->nullable(); // in case costumer or supplier canceled
             $table->timestamps();

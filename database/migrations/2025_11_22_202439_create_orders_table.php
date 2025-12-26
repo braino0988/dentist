@@ -15,11 +15,11 @@ return new class extends Migration
             $table->id();
             $table->string('order_number')->unique()->nullable();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->unsignedInteger('number_of_items')->default(0);
-            $table->decimal('subtotal', 10, 2)->default(0);
-            $table->decimal('tax_amount', 10, 2)->default(0);
-            $table->decimal('discount_amount', 10, 2)->default(0);
-            $table->decimal('total_amount', 10, 2)->default(0);   // total=subtotal + tax - discount
+            $table->Integer('number_of_items')->min(0)->default(0);
+            $table->decimal('subtotal', 10, 2)->min(0)->default(0);
+            $table->decimal('tax_amount', 10, 2)->min(0)->default(0);
+            $table->decimal('discount_amount', 10, 2)->min(0)->default(0);
+            $table->decimal('total_amount', 10, 2)->min(0)->default(0);   // total=subtotal + tax - discount
             $table->string('currency', 3)->default('SEK');
             $table->string('payment_method')->nullable();
             $table->date('order_date');

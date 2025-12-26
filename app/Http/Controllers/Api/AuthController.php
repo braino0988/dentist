@@ -62,7 +62,7 @@ class AuthController extends Controller
             'email'=>'string|email|required|unique:users,email',
             'password'=>'string|required|confirmed',
             'is_employee'=>'boolean|required_with:roles',
-            'roles'=>'array',
+            'roles'=>'array|required_with:is_employee',
             'roles.*'=>'string|exists:roles,type'
         ]);
         Log::error($request->user()->roles()->get());

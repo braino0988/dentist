@@ -19,12 +19,13 @@ return new class extends Migration
             $table->foreignIdFor(Order::class)->constrained()->onDelete('cascade');
             $table->string('invoice_number')->unique(); // e.g. INV-2025-0001
             $table->date('invoice_date');
-            $table->decimal('subtotal', 10, 2);
-            $table->decimal('tax_amount', 10, 2)->default(0);
-            $table->decimal('discount_amount', 10, 2)->default(0);
-            $table->decimal('total_amount', 10, 2);
-            //$table->string('currency', 3)->default('SEK');
+            $table->decimal('subtotal', 10, 2)->min(0);
+            $table->decimal('tax_amount', 10, 2)->min(0)->default(0);
+            $table->decimal('discount_amount', 10, 2)->min(0)->default(0);
+            $table->decimal('total_amount', 10, 2)->min(0);
+            $table->string('currency', 3)->default('SEK');
             $table->string('payment_status')->default('unpaid'); // unpaid, paid, overdue
+            $table->date('due_date')->nullable();
             $table->string('notes')->nullable();
             $table->timestamps();
         });

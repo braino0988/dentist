@@ -56,4 +56,24 @@ class UserPolicy
         Log::error('hi from policy - updateOrder');
         return $user->isAdmin() || $user->isInventory();
     }
+    public function supplierOrder(User $user): bool
+    {
+        Log::error('hi from policy - supplierOrder');
+        return $user->isAdmin() || $user->isInventory();
+    }
+    public function customerInvoice(User $user): bool
+    {
+        Log::error('hi from policy - customerInvoice');
+        return $user->isAdmin() || $user->isInventory();
+    }
+    public function SupplierInvoice(User $user): bool
+    {
+        Log::error('hi from policy - SupplierInvoice');
+        return $user->isAdmin() || $user->isInventory();
+    }
+    public function supplierInfo(User $user): bool
+    {
+        Log::error('hi from policy - supplierInfo');
+        return $user->isAdmin() || $user->isInventory();
+    }
 }

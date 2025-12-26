@@ -15,13 +15,15 @@ return new class extends Migration
             $table->id();
             $table->foreignId('supplier_order_id')->constrained()->onDelete('cascade');
             $table->foreignId('supplier_id')->constrained()->onDelete('cascade');
-            $table->string('invoice_number')->unique();
+            $table->string('invoice_number')->unique(); // e.g. S_INV-2025-0001
             $table->date('invoice_date');
-            $table->decimal('subtotal', 10, 2);
-            $table->decimal('tax_amount', 10, 2);
-            $table->decimal('total_amount', 10, 2);
+            $table->decimal('subtotal', 10, 2)->min(0);
+            $table->decimal('tax_amount', 10, 2)->min(0);
+            $table->decimal('total_amount', 10, 2)->min(0);
+            $table->string('currency', 3)->default('SEK');
             $table->date('due_date')->nullable();
-            $table->string('payment_status')->default('pending'); //paid, pending , over due
+            $table->string('payment_status')->default('unpaid'); //paid, unpaid , over due
+            $table->string('notes')->nullable();
             $table->timestamps();
         });
     }

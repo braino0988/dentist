@@ -25,7 +25,7 @@ return new class extends Migration
             $table->string('payment_method');
             $table->string('currency',3)->default('SEK');
             $table->string('transaxtion_id')->nullable()->unique();
-            $table->decimal('amount',10,2);
+            $table->decimal('amount',10,2)->min(0);
             $table->string('notes');
             $table->timestamps();
         });
