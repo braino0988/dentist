@@ -59,9 +59,10 @@ class SupplierOrderController extends Controller
                 if (!$request->has('products') || count($atts['products']) === 0) {
                     return $order;
                 }
-                $order->number_of_items = count($atts['products']);
+                $number_of_items=0;
                 foreach ($atts['products'] as $productData) {
                     $product = Product::findOrFail($productData['id']);
+                    $number_of_items += $productData['quantity'];
                     // $discountAmount = 0;
                     // if ($product->discount_rate) {
                     //     $discountAmount = ($product->price * ($product->discount_rate / 100));
@@ -82,6 +83,7 @@ class SupplierOrderController extends Controller
                     $order->tax_amount += $lineTax;
                 }
                 $order->total_amount = ($order->subtotal + $order->tax_amount);
+                $order->number_of_items = $number_of_items;
                 $order->save();
                 return $order;
             });

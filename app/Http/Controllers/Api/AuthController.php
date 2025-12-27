@@ -30,16 +30,17 @@ class AuthController extends Controller
     {
         $atts = $request->validate([
             'email' => 'required|string|email|max:255|unique:users,email',
+            'phone' => 'nullable|string|max:20|unique:users,phone',
+            'address' => 'nullable|string|max:500',
             'password' => 'required|string|min:8|confirmed',
             'name' => 'required|string|max:255|unique:users,name'
             ]);
-        Log::info('User Data Before Insert:', ['userData' => [
-            'name' => $atts['name'],
-            'email' => $atts['email'],
-        ]]);
+        Log::info('User Data Before Insert:', ['userData' =>$atts]);
         $user = User::create([
             'name' => $atts['name'],
             'email' => $atts['email'],
+            'phone'=>$atts['phone'] ?? '0000',
+            'address'=>$atts['address'] ?? null,
             //here i am using the builr in hash function to hash the password
             'password' => Hash::make($atts['password'])
         ]);
@@ -60,6 +61,8 @@ class AuthController extends Controller
         $atts=$request->validate([
             'name'=>'string|required',
             'email'=>'string|email|required|unique:users,email',
+            'phone' => 'nullable|string|max:20|unique:users,phone',
+            'address' => 'nullable|string|max:500',
             'password'=>'string|required|confirmed',
             'is_employee'=>'boolean|required_with:roles',
             'roles'=>'array|required_with:is_employee',
@@ -67,15 +70,14 @@ class AuthController extends Controller
         ]);
         Log::error($request->user()->roles()->get());
         $this->authorize('createUser',User::class);
-        Log::info('Employee Data Before Insert:', ['employeeData' => [
-            'name' => $atts['name'],
-            'email' => $atts['email'],
-        ]]);
+        Log::info('Employee Data Before Insert:', ['employeeData' => $atts]);
         try {
         DB::transaction(function () use ($atts, &$user) {
                     $user = User::create([
                         'name' => $atts['name'],
                         'email' => $atts['email'],
+                        'phone' =>$atss['phone'] ?? '0000',
+                        'address' => $atts['address'] ?? null,
                         'password' => Hash::make($atts['password']),
                         'is_employee' => $atts['is_employee'] ?? false,
                         'email_verified_at' => now()

@@ -15,6 +15,8 @@ return new class extends Migration
     {
         Schema::create('payments', function (Blueprint $table) {
             $table->id();
+            $table->enum('invoice_type',['customer_invoice','supplier_invoice']);
+            $table->unsignedBigInteger('invoice_id');
             $table->enum('payable_type',['order','supplier_order']);
             $table->unsignedBigInteger('payable_id');//postgre
             $table->enum('payment_type',['incoming','outgoing']);
@@ -24,7 +26,7 @@ return new class extends Migration
             $table->date('payment_date');
             $table->string('payment_method');
             $table->string('currency',3)->default('SEK');
-            $table->string('transaxtion_id')->nullable()->unique();
+            $table->string('transaction_id')->nullable()->unique();
             $table->decimal('amount',10,2)->min(0);
             $table->string('notes');
             $table->timestamps();

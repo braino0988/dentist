@@ -76,4 +76,9 @@ class UserPolicy
         Log::error('hi from policy - supplierInfo');
         return $user->isAdmin() || $user->isInventory();
     }
+    public function payment(User $user): bool
+    {
+        Log::error('hi from policy - payment');
+        return $user->isAdmin() || $user->isInventory();
+    }
 }

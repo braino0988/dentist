@@ -14,7 +14,7 @@ class Order extends Model
         return $this->belongsTo(User::class);
     }
     public function invoice(){
-        return $this->hasOne(Invoice::class);
+        return $this->hasMany(Invoice::class);
     }
     public function stockMovments(){
         return $this->hasMany(StockMovment::class);

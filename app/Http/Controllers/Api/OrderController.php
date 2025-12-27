@@ -60,12 +60,10 @@ class OrderController extends Controller
                 if (!$request->has('products') || count($atts['products']) === 0) {
                     return $order;
                 }
-                $order->number_of_items = count($atts['products']);
-                Log::error('here 3 ');
+                $number_of_items=0;
                 foreach ($atts['products'] as $productData) {
-                    Log::error('i made it here 2');
                     $product = Product::findOrFail($productData['id']);
-                    Log::error('i made it here');
+                    $number_of_items+=$productData['quantity'];
                     $discountAmount = 0;
                     if ($product->discount_rate) {
                         $discountAmount = ($product->price * ($product->discount_rate / 100));
@@ -86,6 +84,7 @@ class OrderController extends Controller
                     $order->tax_amount += $lineTax;
                 }
                 $order->total_amount = ($order->subtotal + $order->tax_amount) - $order->discount_amount;
+                $order->number_of_items=$number_of_items;
                 $order->save();
                 return $order;
             });

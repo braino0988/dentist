@@ -14,7 +14,7 @@ class SupplierOrder extends Model
             ->withPivot('quantity', 'unit_price', 'tax_rate', 'tax_amount')->withTimestamps();
     }
     public function supplierInvoices(){
-        return $this->hasone(SupplierInvoice::class);
+        return $this->hasMany(SupplierInvoice::class);
     }
     public function stockMovments(){
         return $this->hasMany(StockMovment::class);
