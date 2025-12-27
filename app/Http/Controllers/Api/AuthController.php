@@ -39,7 +39,7 @@ class AuthController extends Controller
         $user = User::create([
             'name' => $atts['name'],
             'email' => $atts['email'],
-            'phone'=>$atts['phone'] ?? '0000',
+            'phone'=>$atts['phone'],
             'address'=>$atts['address'] ?? null,
             //here i am using the builr in hash function to hash the password
             'password' => Hash::make($atts['password'])
@@ -76,7 +76,7 @@ class AuthController extends Controller
                     $user = User::create([
                         'name' => $atts['name'],
                         'email' => $atts['email'],
-                        'phone' =>$atss['phone'] ?? '0000',
+                        'phone' =>$atts['phone'],
                         'address' => $atts['address'] ?? null,
                         'password' => Hash::make($atts['password']),
                         'is_employee' => $atts['is_employee'] ?? false,
@@ -164,4 +164,38 @@ class AuthController extends Controller
 
         return response()->json(['message' => 'Verification email resent']);
     }
+    public function me(Request $request){
+        return UserResource::make($request->user());
+    }
+    public function deleteUser(Request $request, $id){
+        $this->authorize('deleteUser', User::class);
+        $user = User::find($id);
+        if (!$user) {
+            return response()->json(['message' => 'User not found'], 404);
+        }
+        if($request->user()->id == $user->id){
+            return response()->json(['message' => 'You cannot delete your own account'], 403);
+        }
+        $user->delete();
+        return response()->json(['message' => 'User deleted successfully']);
+    }
+    // public function updateUser(Request $request, $id){
+    //     $this->authorize('editUser', User::class);
+    //     $user = User::find($id);}
+    // public function sendResetLinkEmail(Request $request)
+    // {
+    //     $atts = $request->validate([
+    //         'email' => 'required|email|exists:users,email',
+    //     ]);
+
+    //     $user = User::where('email', $atts['email'])->first();
+    //     if(!$user){
+    //         return response()->json(['message' => 'User with this email not found'], 404);
+    //     }
+    //     $user->sendPasswordResetNotification();
+    //     return response()->json([
+    //         'message' => 'Password reset link has been sent to your email address.'
+    //     ]);
+    // }
+
 }

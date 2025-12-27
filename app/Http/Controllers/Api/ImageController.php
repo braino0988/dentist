@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\ProductResource;
 use App\Models\Image;
 use App\Models\Product;
 use App\Models\User;
@@ -35,29 +36,37 @@ class ImageController extends Controller
                 'error' => $e->getMessage(),
             ], 500);
         }
+    }else{
+        return response()->json(['message'=>'Image not found'],404);
     }
     }
-    public function store(Request $request){
+    public function addImages(Request $request, $id)
+    {
         $this->authorize('createProduct', User::class);
-        $atts=$request->validate([
-            'product_id'=>'required|exists:products,id',
-            'image'=> 'image|max:2048|mimes:jpeg,png,jpg,webp'
+        $atts = $request->validate([
+            'images' => 'required|array',
+            'images.*' => 'image|max:2048|mimes:jpeg,png,jpg,webp',
         ]);
-        $product=Product::findOrFail($atts['product_id']);
-        try{
-        if($product && $request->hasFile('image')){
-            $image=$request->file('image');
-            $path=$image->store('products','public');
-            $product->images()->create([
-                'path' => $path,
-            ]);
+        $product = Product::find($id);
+        if (!$product) {
+            return response()->json(['message' => 'Product not found'], 404);
         }
-        return response()->json(['message'=>'image stored'],201);
+        try {
+            foreach ($atts['images'] as $image) {
+                $path = $image->store('products', 'public');
+                $product->images()->create([
+                    'path' => $path,
+                ]);
+            }
         } catch (\Exception $e) {
             return response()->json([
-                'message' => 'image not stored something went wrong',
+                'message' => 'Failed to upload images',
                 'error' => $e->getMessage(),
             ], 500);
         }
+        return response()->json([
+            'message' => 'Images uploaded successfully',
+            'product' => ProductResource::make($product->load('images')),
+        ], 200);
     }
 }

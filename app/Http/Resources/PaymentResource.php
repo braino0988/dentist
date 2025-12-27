@@ -16,6 +16,8 @@ class PaymentResource extends JsonResource
     {
         return [
             'id'=>$this->id,
+            'invoice_type'=>$this->invoice_type,
+            'invoice_id'=>$this->invoice_id,
             'payable_type'=>$this->payable_type,
             'payable_id'=>$this->payable_id,
             'payment_type'=>$this->payment_type,

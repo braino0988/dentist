@@ -11,6 +11,8 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
 {
@@ -33,10 +35,10 @@ class ProductController extends Controller
             'description' => 'nullable|string',
             's_description' => 'nullable|string',
             'sku'=>'nullable|string|unique:products,sku',
-            'price' => 'required|numeric',
-            'cost'=> 'required|numeric',
+            'price' => 'required|numeric|min:0',
+            'cost'=> 'required|numeric|min:0',
             'category' => 'required|string',
-            'stock_quantity' => 'nullable|integer',
+            'stock_quantity' => 'nullable|integer|min:0',
             'delivery_option' => 'nullable|string',
             'tax_rate' => 'nullable|numeric|max:100|min:0',
             'product_rate' => 'nullable|numeric|max:5|min:0',
@@ -46,20 +48,21 @@ class ProductController extends Controller
         ]);
         try {
             $product = DB::transaction(function () use ($atts, &$product) {
-                $category_id = Category::where('name', $atts['category'])->orWhere('s_name', $atts['category'])->first()->id;
-                if (!$category_id) {
-                    $category_id = Category::create([
+                $category = Category::where('name', $atts['category'])->orWhere('s_name', $atts['category'])->first();
+                if (!$category) {
+                    $category = Category::create([
                         'name' => $atts['category'],
                         's_name' => $atts['category'],
                         'enabled' => true,
-                    ])->id;
+                    ]);
+                    $category_id=$category->id;
+                }else{
+                    $category_id=$category->id;
                 }
-                if(!isset($atts['sku'])){
-                $atts['sku'] = 'SKU-' . strtoupper(uniqid());}
-                return Product::create([
+                $product= Product::create([
                     'name' => $atts['name'] ?? $atts['s_name'],
                     's_name' => $atts['s_name'] ?? $atts['name'],
-                    'sku'=> $atts['sku'],
+                    'sku'=> $atts['sku'] ?? 'placeholder',
                     'description' => $atts['description'] ?? null,
                     's_description' => $atts['s_description'] ?? null,
                     'price' => $atts['price'],
@@ -72,6 +75,20 @@ class ProductController extends Controller
                     'tax_rate' => $atts['tax_rate'] ?? 0,
                     'discount_rate' => $atts['discount_rate'] ?? 0,
                 ]);
+                if ($product->stock_quantity < 0) {
+                    $product->status = 'alertstock';
+                } elseif ($product->stock_quantity <= 0) {
+                    $product->status = 'outofstock';
+                } elseif ($product->stock_quantity < 10) {
+                    $product->status = 'lowstock';
+                } else {
+                    $product->status = 'instock';
+                }
+                if(!isset($atts['sku'])){
+                $product->sku = 'SKU-' . date('Y').date('M').$product->id;
+                $product->save();
+                }
+                return $product;
             });
             if ($request->hasFile('images')) {
                 try {
@@ -111,28 +128,56 @@ class ProductController extends Controller
             'sku'=>'nullable|string|unique:products,sku,'.$product->id,
             'product_rate' => 'nullable|numeric',
             'status' => 'nullable|string',
-            'price' => 'nullable|numeric',
-            'cost'=> 'nullable|numeric',
+            'price' => 'nullable|numeric|min:0',
+            'cost'=> 'nullable|numeric|min:0',
             'category' => 'nullable|string',
-            'stock_quantity' => 'nullable|integer',
+            'stock_quantity' => 'nullable|integer|min:0',
             'delivery_option' => 'nullable|string',
-            'tax_rate' => 'nullable|numeric',
-            'discount_rate' => 'nullable|numeric',
+            'tax_rate' => 'nullable|numeric|min:0',
+            'discount_rate' => 'nullable|numeric|min:0',
         ]);
         try {
             DB::transaction(function () use ($atts, &$product) {
                 if (isset($atts['category'])) {
-                    $category_id = Category::where('name', $atts['category'])->orWhere('s_name', $atts['category'])->first()->id;
-                    if (!$category_id) {
-                        $category_id = Category::create([
+                    $category = Category::where('name', $atts['category'])->orWhere('s_name', $atts['category'])->first();
+                    if (!$category) {
+                        $category = Category::create([
                             'name' => $atts['category'],
                             's_name' => $atts['category'],
                             'enabled' => true,
-                        ])->id;
+                        ]);
+                        $category_id=$category->id;
+                        $atts['category_id'] = $category_id;
+                    }else{
+                        $category_id=$category->id;
                         $atts['category_id'] = $category_id;
                     }
                 }
-                $product->update($atts);
+                $product->update([
+                    'name' => $atts['name'] ?? $product->name,
+                    's_name' => $atts['s_name'] ?? $product->s_name,
+                    'sku'=> $atts['sku'] ?? $product->sku,
+                    'description' => $atts['description'] ?? $product->description,
+                    's_description' => $atts['s_description'] ?? $product->s_description,
+                    'price' => $atts['price'] ?? $product->price,
+                    'cost' => $atts['cost'] ?? $product->cost,
+                    'product_rate' => $atts['product_rate'] ?? $product->product_rate,
+                    'status' => $atts['status'] ?? $product->status,
+                    'category_id' => $atts['category_id'] ?? $product->category_id,
+                    'stock_quantity' => $atts['stock_quantity'] ?? $product->stock_quantity,
+                    'delivery_option' => $atts['delivery_option'] ?? $product->delivery_option,
+                    'tax_rate' => $atts['tax_rate'] ?? $product->tax_rate,
+                    'discount_rate' => $atts['discount_rate'] ?? $product->discount_rate,
+                ]);
+                if($product->stock_quantity<0){
+                    $product->status = 'alertstock';
+                }elseif($product->stock_quantity<=0){
+                    $product->status='outofstock';
+                    }elseif($product->stock_quantity < 10){
+                    $product->status='lowstock';
+                    }else{
+                    $product->status='instock';
+                    }
                 $product->save();
             });
         } catch (\Exception $e) {
@@ -143,15 +188,23 @@ class ProductController extends Controller
         }
         return response()->json([
             'message' => 'Product updated successfully',
-            'product' => $product,
+            'product' => ProductResource::make($product->load('images')),
         ], 200);
     }
     public function destroy($id)
     {
         //do we need to create a policy for deleting products?
         $this->authorize('createProduct', User::class);
-        $product = Product::findOrFail($id);
+        $product = Product::find($id);
+        if(!$product){
+            return response()->json(['message'=>'Product not found'],404);
+        }
         try {
+            $images=$product->images()->get();
+            Log::error($images);
+            foreach($images as $image){
+                Storage::disk('public')->delete($image->path);
+            }
             $product->delete();
         } catch (\Exception $e) {
             return response()->json([

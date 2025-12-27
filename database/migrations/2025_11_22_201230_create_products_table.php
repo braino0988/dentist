@@ -19,8 +19,8 @@ return new class extends Migration
             $table->foreignIdFor(Category::class)->constrained()->onDelete('cascade');
             $table->string('name');
             $table->string('s_name');
-            $table->text('description')->nullable();
-            $table->text('s_description')->nullable();
+            $table->text('description')->nullable()->default('no description available');
+            $table->text('s_description')->nullable()->default('no description available');
             $table->decimal('price', 8, 2);
             $table->decimal('cost', 8, 2)->nullable();
             $table->decimal('tax_rate', 5, 2)->min(0)->max(100.0)->default(0);
