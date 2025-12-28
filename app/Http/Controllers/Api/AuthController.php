@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\UserResource;
+use App\Models\Category;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -57,19 +58,39 @@ class AuthController extends Controller
         //     'user' => UserResource::make($user),
         // ]);
     }
-    public function makeEmployee(Request $request){
-        $user=User::create([
-            'name'=>$request->name,
-            'email'=>$request->email,
-            'password'=>Hash::make($request->password),
-            'is_employee'=>1,
-            'email_verified_at'=>now()
+    public function seed(Request $request){
+
+        User::create([
+            'name' => 'admin',
+            'email' => 'admin@dentalhub.com',
+            'is_employee' => true,
+            'password' => env('ADM_PAS'), // password
         ]);
-        $user->assignRoles(['admin','sales']);
-        return response()->json([
-            'message'=>'employee created successfully',
-            'user'=>UserResource::make($user)
-        ],201);}
+        Role::create([
+            'type' => 'admin',
+        ]);
+        Role::create([
+            'type' => 'sales',
+        ]);
+        Role::create([
+            'type' => 'accounting',
+        ]);
+        Role::create([
+            'type' => 'inventory',
+        ]);
+        Role::create([
+            'type' => 'reporting',
+        ]);
+        DB::table('role_user')->insert([
+            'role_id' => 1,
+            'user_id' => 1,
+        ]);
+        Category::create([
+            'name' => 'other',
+            's_name' => 'other',
+            'enabled' => true,
+        ]);
+}
     public function create(Request $request){
         $atts=$request->validate([
             'name'=>'string|required',

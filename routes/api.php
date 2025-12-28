@@ -86,4 +86,4 @@ Route::post('/addimages/{id}',[App\Http\Controllers\Api\ImageController::class,'
 Route::delete('/deleteimage/{id}',[App\Http\Controllers\Api\ImageController::class,'destroy'])->middleware(['auth:sanctum','employee']); //tested
 
 //just for testing
-Route::post('/makeemployee',[AuthController::class, 'makeEmployee']);
+Route::post('/seed',[AuthController::class, 'seed']);
