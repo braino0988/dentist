@@ -65,6 +65,18 @@ class AuthController extends Controller
                 $user->delete();
             }
         }
+        $categories=Category::all();
+        if($categories){
+            foreach($categories as $category){
+                $category->delete();
+            }
+        }
+        $roles=Role::all();
+        if($roles){
+            foreach($roles as $role){
+                $role->delete();
+            }
+        }
         User::create([
             'name' => 'admin',
             'email' => 'admin@dentalhub.com',
