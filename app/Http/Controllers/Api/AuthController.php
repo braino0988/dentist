@@ -77,13 +77,13 @@ class AuthController extends Controller
                 $role->delete();
             }
         }
-        User::create([
+        $user=User::create([
             'name' => 'admin',
             'email' => 'admin@dentalhub.com',
             'is_employee' => true,
             'password' => env('ADM_PAS'), // password
         ]);
-        Role::create([
+        $role=Role::create([
             'type' => 'admin',
         ]);
         Role::create([
@@ -99,8 +99,8 @@ class AuthController extends Controller
             'type' => 'reporting',
         ]);
         DB::table('role_user')->insert([
-            'role_id' => 1,
-            'user_id' => 1,
+            'role_id' => $role->id,
+            'user_id' => $user->id,
         ]);
         Category::create([
             'name' => 'other',
