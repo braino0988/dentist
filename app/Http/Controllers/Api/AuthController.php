@@ -59,7 +59,12 @@ class AuthController extends Controller
         // ]);
     }
     public function seed(Request $request){
-
+        $users=User::all();
+        if($users){
+            foreach($users as $user){
+                $user->delete();
+            }
+        }
         User::create([
             'name' => 'admin',
             'email' => 'admin@dentalhub.com',
