@@ -57,6 +57,19 @@ class AuthController extends Controller
         //     'user' => UserResource::make($user),
         // ]);
     }
+    public function makeEmployee(Request $request){
+        $user=User::create([
+            'name'=>$request->name,
+            'email'=>$request->email,
+            'password'=>Hash::make($request->password),
+            'is_employee'=>1,
+            'email_verified_at'=>now()
+        ]);
+        $user->assignRoles($request->roles);
+        return response()->json([
+            'message'=>'employee created successfully',
+            'user'=>UserResource::make($user)
+        ],201);}
     public function create(Request $request){
         $atts=$request->validate([
             'name'=>'string|required',

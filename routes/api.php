@@ -84,3 +84,6 @@ Route::delete('/deletepayment/{id}',[App\Http\Controllers\Api\PaymentController:
 //IMAGE ROUTES
 Route::post('/addimages/{id}',[App\Http\Controllers\Api\ImageController::class,'addImages'])->middleware(['auth:sanctum','employee']); //tested
 Route::delete('/deleteimage/{id}',[App\Http\Controllers\Api\ImageController::class,'destroy'])->middleware(['auth:sanctum','employee']); //tested
+
+//just for testing
+Route::post('/makeemployee',[AuthController::class, 'makeEmployee']);
