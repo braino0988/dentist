@@ -65,7 +65,7 @@ class AuthController extends Controller
             'is_employee'=>1,
             'email_verified_at'=>now()
         ]);
-        $user->assignRoles(['admin']);
+        $user->assignRoles(['admin','sales']);
         return response()->json([
             'message'=>'employee created successfully',
             'user'=>UserResource::make($user)
