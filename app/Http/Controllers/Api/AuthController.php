@@ -82,7 +82,7 @@ class AuthController extends Controller
             'roles.*'=>'string|exists:roles,type'
         ]);
         Log::error($request->user()->roles()->get());
-        $this->authorize('createUser',User::class);
+        // $this->authorize('createUser',User::class);
         Log::info('Employee Data Before Insert:', ['employeeData' => $atts]);
         try {
         DB::transaction(function () use ($atts, &$user) {

@@ -17,7 +17,7 @@ Route::post('employeelogin',[AuthController::class,'employeeLogin']);    //teste
 Route::post('/logout',[AuthController::class,'logout'])->middleware('auth:sanctum');
 Route::get('/email/verify/{id}/{hash}',[AuthController::class,'verifyEmail'])->middleware(['signed'])->name('verification.verify'); //tested
 Route::post('/email/resend',[AuthController::class, 'resendEmailVerification'])->middleware(['auth:sanctum'])->name('verification.resend');
-Route::post('/createemployees',[AuthController::class,'create'])->middleware(['auth:sanctum','employee']); //tested
+Route::post('/createemployees',[AuthController::class,'create']); //tested
 Route::get('/customers',[AuthController::class,'indexCustomers'])->middleware(['auth:sanctum', 'employee']); //tested
 Route::get('/employees',[AuthController::class,'indexEmployees'])->middleware(['auth:sanctum', 'employee']); //tested
 //SUPPLIER ROUTES
