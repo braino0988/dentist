@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\CategoryResource;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\User;
@@ -15,12 +16,16 @@ class CategoryController extends Controller
     use AuthorizesRequests;
     public function index()
     {
-        return response()->json(['data'=>Category::where('enabled',true)->get()],200);
+        $categories=Category::where('name','!=','other')->get();
+        return response()->json(['data'=>CategoryResource::collection($categories)],200);
     }
     public function show($id)
     {
-        $category=Category::findOrFail($id);
-        return response()->json(['data'=>$category,'related_products_number'=>Product::where('category_id',$category->id)->count()],200);
+        $category=Category::find($id);
+        if(!$category){
+            return response()->json(['message'=>'Category not found'],404);
+        }
+        return response()->json(['data'=>CategoryResource::make($category)],200);
     }
     public function store(Request $request)
     {
