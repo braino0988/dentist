@@ -41,7 +41,7 @@ Route::delete('/deletecategory/{id}',[App\Http\Controllers\Api\CategoryControlle
 //CUSTOMER OREDERS ROUTES
 Route::get('/customerorders',[OrderController::class,'index'])->middleware(['auth:sanctum', 'employee']);
 Route::get('/customerorders/{id}',[OrderController::class,'show'])->middleware(['auth:sanctum', 'employee']);
-Route::post('/createorder',[OrderController::class,'store'])->middleware(['auth:sanctum', 'employee']);
+Route::post('/createorder',[OrderController::class,'store'])->middleware(['auth:sanctum']);
 Route::post('/confirmcustomerorder/{id}',[OrderController::class,'confirm'])->middleware(['auth:sanctum', 'employee']);
 Route::post('/cancelcustomerorder/{id}',[OrderController::class,'cancel'])->middleware(['auth:sanctum', 'employee']);
 Route::post('/deletecustomerorder/{id}',[OrderController::class,'destroy'])->middleware(['auth:sanctum', 'employee']);

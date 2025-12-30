@@ -22,7 +22,9 @@ class UserResource extends JsonResource
             'phone'=>$this->phone ?? '0000',
             'address'=>$this->address ?? null,
             'roles'=>$this->is_employee ? $this->roles()->pluck('type') : 'customer only',
-            'join_date'=>$this->created_at
+            'join_date'=>$this->created_at,
+            'orders_count'=>$this->orders()->count(),
+            'total_spent'=>number_format($this->orders()->sum('total_amount'),2),
         ];
     }
 }

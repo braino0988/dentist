@@ -64,13 +64,13 @@ class OrderController extends Controller
                 foreach ($atts['products'] as $productData) {
                     $product = Product::findOrFail($productData['id']);
                     $number_of_items+=$productData['quantity'];
-                    $discountAmount = 0;
-                    if ($product->discount_rate) {
-                        $discountAmount = ($product->price * ($product->discount_rate / 100));
-                    }
                     $quantity = $productData['quantity'];
                     $lineSubtotal = $product->price * $quantity;
                     $lineTax = $lineSubtotal * (($product->tax_rate ?? 0) / 100);
+                    $discountAmount = 0;
+                    if ($product->discount_rate) {
+                        $discountAmount = ($lineSubtotal * ($product->discount_rate / 100));
+                    }
                     $order->products()->attach($product->id, [
                         'quantity' => $quantity,
                         'unit_price' => $product->price,
