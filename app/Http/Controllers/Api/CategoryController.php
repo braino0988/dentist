@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Category;
+use App\Models\Product;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -14,11 +15,12 @@ class CategoryController extends Controller
     use AuthorizesRequests;
     public function index()
     {
-        return response()->json(['data'=>Category::all()],200);
+        return response()->json(['data'=>Category::where('enabled',true)->get()],200);
     }
     public function show($id)
     {
-        //
+        $category=Category::findOrFail($id);
+        return response()->json(['data'=>$category,'related_products_number'=>Product::where('category_id',$category->id)->count()],200);
     }
     public function store(Request $request)
     {

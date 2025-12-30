@@ -22,6 +22,7 @@ class UserResource extends JsonResource
             'phone'=>$this->phone ?? '0000',
             'address'=>$this->address ?? null,
             'roles'=>$this->is_employee ? $this->roles()->pluck('type') : 'customer only',
+            'join_date'=>$this->created_at
         ];
     }
 }

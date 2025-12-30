@@ -32,7 +32,7 @@ class OrderController extends Controller
     {
         // $this->authorize('createOrder', User::class);
         $atts = $request->validate([
-            'currency' => 'nullable|string|max:3',
+            'currency' => 'nullable|string|max:5',
             'payment_method' => 'nullable|string|max:255',
             'notes' => 'string|nullable',
             'products' => 'nullable|array|min:1',
@@ -70,7 +70,7 @@ class OrderController extends Controller
                     }
                     $quantity = $productData['quantity'];
                     $lineSubtotal = $product->price * $quantity;
-                    $lineTax = $lineSubtotal * ($product->tax_rate ?? 0 / 100);
+                    $lineTax = $lineSubtotal * (($product->tax_rate ?? 0) / 100);
                     $order->products()->attach($product->id, [
                         'quantity' => $quantity,
                         'unit_price' => $product->price,

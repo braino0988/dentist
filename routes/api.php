@@ -34,9 +34,10 @@ Route::post('/updateproduct/{id}',[App\Http\Controllers\Api\ProductController::c
 Route::delete('/deleteproduct/{id}',[App\Http\Controllers\Api\ProductController::class,'destroy'])->middleware(['auth:sanctum','employee']); //tested
 //CATEGORY ROUTES
 Route::get('/categories',[App\Http\Controllers\Api\CategoryController::class,'index']); //tested
-Route::post('/createcategory',[App\Http\Controllers\Api\CategoryController::class,'store'])->middleware(['auth:sanctum','employee']);
-Route::post('/updatecategory/{id}',[App\Http\Controllers\Api\CategoryController::class,'updateState'])->middleware(['auth:sanctum','employee']);
-Route::delete('/deletecategory/{id}',[App\Http\Controllers\Api\CategoryController::class,'destroy'])->middleware(['auth:sanctum','employee']);
+Route::post('/createcategory',[App\Http\Controllers\Api\CategoryController::class,'store'])->middleware(['auth:sanctum','employee']); //tested
+Route::get('/categories/{id}',[App\Http\Controllers\Api\CategoryController::class,'show']); //tested
+Route::post('/updatecategorystate/{id}',[App\Http\Controllers\Api\CategoryController::class,'updateState'])->middleware(['auth:sanctum','employee']); //tested
+Route::delete('/deletecategory/{id}',[App\Http\Controllers\Api\CategoryController::class,'destroy'])->middleware(['auth:sanctum','employee']); //tested
 //CUSTOMER OREDERS ROUTES
 Route::get('/customerorders',[OrderController::class,'index'])->middleware(['auth:sanctum', 'employee']);
 Route::get('/customerorders/{id}',[OrderController::class,'show'])->middleware(['auth:sanctum', 'employee']);
