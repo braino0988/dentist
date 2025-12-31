@@ -40,6 +40,7 @@ class ProductController extends Controller
             'cost'=> 'required|numeric|min:0',
             'category' => 'required|string',
             'stock_quantity' => 'nullable|integer|min:0',
+            'stock_alert'=>'nullable|integer|min:0',
             'delivery_option' => 'nullable|string',
             'tax_rate' => 'nullable|numeric|max:100|min:0',
             'product_rate' => 'nullable|numeric|max:5|min:0',
@@ -72,6 +73,7 @@ class ProductController extends Controller
                     'status' => $atts['status'] ?? 'instock',
                     'category_id' => $category_id,
                     'stock_quantity' => $atts['stock_quantity'] ?? 0,
+                    'stock_alert'=>$atts['stock_alert'] ?? 10,
                     'delivery_option' => $atts['delivery_option'] ?? null,
                     'tax_rate' => $atts['tax_rate'] ?? 0,
                     'discount_rate' => $atts['discount_rate'] ?? 0,
@@ -80,7 +82,7 @@ class ProductController extends Controller
                     $product->status = 'alertstock';
                 } elseif ($product->stock_quantity <= 0) {
                     $product->status = 'outofstock';
-                } elseif ($product->stock_quantity < 10) {
+                } elseif ($product->stock_quantity < $product->stock_alert) {
                     $product->status = 'lowstock';
                 } else {
                     $product->status = 'instock';
@@ -133,6 +135,7 @@ class ProductController extends Controller
             'cost'=> 'nullable|numeric|min:0',
             'category' => 'nullable|string',
             'stock_quantity' => 'nullable|integer|min:0',
+            'stock_alert'=>'nullable|integer|min:0',
             'delivery_option' => 'nullable|string',
             'tax_rate' => 'nullable|numeric|min:0',
             'discount_rate' => 'nullable|numeric|min:0',
@@ -166,6 +169,7 @@ class ProductController extends Controller
                     'status' => $atts['status'] ?? $product->status,
                     'category_id' => $atts['category_id'] ?? $product->category_id,
                     'stock_quantity' => $atts['stock_quantity'] ?? $product->stock_quantity,
+                    'stock_alert'=>$atts['stock_alert'] ?? $product->stock_alert,
                     'delivery_option' => $atts['delivery_option'] ?? $product->delivery_option,
                     'tax_rate' => $atts['tax_rate'] ?? $product->tax_rate,
                     'discount_rate' => $atts['discount_rate'] ?? $product->discount_rate,
@@ -174,7 +178,7 @@ class ProductController extends Controller
                     $product->status = 'alertstock';
                 }elseif($product->stock_quantity<=0){
                     $product->status='outofstock';
-                    }elseif($product->stock_quantity < 10){
+                    }elseif($product->stock_quantity < $product->stock_alert){
                     $product->status='lowstock';
                     }else{
                     $product->status='instock';

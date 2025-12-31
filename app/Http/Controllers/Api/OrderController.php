@@ -125,7 +125,7 @@ class OrderController extends Controller
                         $product->status = 'alertstock';
                     } elseif ($projectedQty <= 0) {
                         $product->status = 'outofstock';
-                    } elseif ($projectedQty < 10) {
+                    } elseif ($projectedQty < $product->stock_alert) {
                         $product->status = 'lowstock';
                     } else {
                         $product->status = 'instock';
@@ -173,7 +173,7 @@ class OrderController extends Controller
                         $product->status = 'alertstock';
                     } elseif ($projectedQty <= 0) {
                         $product->status = 'outofstock';
-                    } elseif ($projectedQty < 10) {
+                    } elseif ($projectedQty < $product->stock_alert) {
                         $product->status = 'lowstock';
                     } else {
                         $product->status = 'instock';

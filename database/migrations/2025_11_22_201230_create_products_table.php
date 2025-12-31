@@ -22,9 +22,10 @@ return new class extends Migration
             $table->text('description')->nullable()->default('no description available');
             $table->text('s_description')->nullable()->default('no description available');
             $table->decimal('price', 8, 2);
-            $table->decimal('cost', 8, 2)->nullable();
+            $table->decimal('cost', 8, 2)->default(0);
             $table->decimal('tax_rate', 5, 2)->min(0)->max(100.0)->default(0);
             $table->integer('stock_quantity')->default(0);
+            $table->string('stock_alert')->default(10);
             $table->string('unit')->nullable();
             $table->string('status')->default('instock'); //instock, outofstock, alertstock
             $table->decimal('product_rate',2,1)->min(0)->max(5.0)->default(0);
