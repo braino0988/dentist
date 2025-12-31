@@ -31,7 +31,7 @@ return new class extends Migration
             $table->decimal('product_rate',2,1)->min(0)->max(5.0)->default(0);
             $table->string('delivery_option')->nullable();
             //restrict this to be max 100
-            $table->decimal('discount_rate', 5, 2)->min(0)->max(100.0)->nullable();
+            $table->decimal('discount_price', 8, 2)->min(0)->default(0);
             $table->timestamps();
         });
     }

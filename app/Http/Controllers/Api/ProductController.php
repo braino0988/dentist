@@ -63,9 +63,7 @@ class ProductController extends Controller
                 }
                 if (isset($atts['discount_price'])) {
                     if ($atts['discount_price'] > $atts['price']) {
-                        $atts['discount_rate'] = 0;
-                    } else {
-                        $atts['discount_rate'] = 100-($atts['discount_price'] * 100) / $atts['price'];
+                        $atts['discount_price'] = 0;
                     }
                 }
                 $product= Product::create([
@@ -83,7 +81,7 @@ class ProductController extends Controller
                     'stock_alert'=>$atts['stock_alert'] ?? 10,
                     'delivery_option' => $atts['delivery_option'] ?? null,
                     'tax_rate' => $atts['tax_rate'] ?? 0,
-                    'discount_rate' => $atts['discount_rate'] ?? 0,
+                    'discount_price' => $atts['discount_price'] ?? 0,
                 ]);
                 if ($product->stock_quantity < 0) {
                     $product->status = 'alertstock';
@@ -165,10 +163,9 @@ class ProductController extends Controller
                     }
                 }
                 if (isset($atts['discount_price'])) {
-                    if($atts['discount_price'] > $atts['price']){
-                        $atts['discount_rate']=0;
-                    }else{
-                    $atts['discount_rate'] = ($atts['discount_price'] * 100) / $atts['price'];}
+                    if ($atts['discount_price'] > $atts['price']) {
+                        $atts['discount_price'] = 0;
+                    }
                 }
                 $product->update([
                     'name' => $atts['name'] ?? $product->name,
@@ -185,7 +182,7 @@ class ProductController extends Controller
                     'stock_alert'=>$atts['stock_alert'] ?? $product->stock_alert,
                     'delivery_option' => $atts['delivery_option'] ?? $product->delivery_option,
                     'tax_rate' => $atts['tax_rate'] ?? $product->tax_rate,
-                    'discount_rate' => $atts['discount_rate'] ?? $product->discount_rate,
+                    'discount_price' => $atts['discount_price'] ?? $product->discount_price,
                 ]);
                 if($product->stock_quantity<0){
                     $product->status = 'alertstock';

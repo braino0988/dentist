@@ -68,8 +68,8 @@ class OrderController extends Controller
                     $lineSubtotal = $product->price * $quantity;
                     $lineTax = $lineSubtotal * (($product->tax_rate ?? 0) / 100);
                     $discountAmount = 0;
-                    if ($product->discount_rate) {
-                        $discountAmount = ($lineSubtotal * ($product->discount_rate / 100));
+                    if ($product->discount_price) {
+                        $discountAmount = ($lineSubtotal -($product->discount_price * $quantity));
                     }
                     $order->products()->attach($product->id, [
                         'quantity' => $quantity,
@@ -209,13 +209,13 @@ class OrderController extends Controller
         $order = Order::findOrFail($id);
         $product = Product::findOrFail($atts['product_id']);
         if ($order && $product) {
-            $discountAmount = 0;
-            if ($product->discount_rate) {
-                $discountAmount = ($product->price * ($product->discount_rate / 100));
-            }
             $quantity = $atts['quantity'];
             $lineSubtotal = $product->price * $quantity;
             $lineTax = $lineSubtotal * ($product->tax_rate ?? 0 / 100);
+                    $discountAmount = 0;
+                    if ($product->discount_price) {
+                        $discountAmount = ($lineSubtotal -($product->discount_price * $quantity));
+                    }
             $order->products()->attach($product->id, [
                 'quantity' => $quantity,
                 'unit_price' => $product->price,
