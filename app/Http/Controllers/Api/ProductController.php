@@ -23,6 +23,7 @@ class ProductController extends Controller
     }
     public function show(Request $request, $id)
     {
+        $request['show']=1;
         $product = Product::with('images')->findOrFail($id);
         return response()->json(['data' => ProductResource::make($product)], 200);
     }
