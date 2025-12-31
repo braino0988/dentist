@@ -28,7 +28,7 @@ class ProductResource extends JsonResource
                 'stock_quantity' => $this->stock_quantity,
                 'category' => $this->category->name,
                 'tax_rate' => $this->tax_rate,
-                'discount_price' => (($this->discount_rate ?? 0) * $this->price) / 100,
+                'discount_price' =>$this->price - (($this->discount_rate ?? 0) * $this->price) / 100,
                 'images' => ImageResource::collection($this->whenLoaded('images')),
                 'product_rate' => $this->product_rate,
                 'status' => $this->status,
@@ -44,7 +44,7 @@ class ProductResource extends JsonResource
                 'stock_quantity' => $this->stock_quantity,
                 'category' => $this->category->name,
                 'tax_rate'=> $this->tax_rate,
-                'discount_price' => (($this->discount_rate ?? 0)*$this->price)/100,
+                'discount_price' => $this->price - (($this->discount_rate ?? 0) * $this->price) / 100,
                 'status' => $this->status,
                 'created_at' => $this->created_at
             ];

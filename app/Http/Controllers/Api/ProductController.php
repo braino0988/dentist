@@ -44,7 +44,7 @@ class ProductController extends Controller
             'delivery_option' => 'nullable|string',
             'tax_rate' => 'nullable|numeric|max:100|min:0',
             'product_rate' => 'nullable|numeric|max:5|min:0',
-            'discount_rate' => 'nullable|numeric|max:100|min:0',
+            'discount_price' => 'nullable|numeric|min:0',
             'images' => 'nullable|array',
             'images.*' => 'image|max:2048|mimes:jpeg,png,jpg,webp',
         ]);
@@ -60,6 +60,13 @@ class ProductController extends Controller
                     $category_id=$category->id;
                 }else{
                     $category_id=$category->id;
+                }
+                if (isset($atts['discount_price'])) {
+                    if ($atts['discount_price'] > $atts['price']) {
+                        $atts['discount_rate'] = 0;
+                    } else {
+                        $atts['discount_rate'] = 100-($atts['discount_price'] * 100) / $atts['price'];
+                    }
                 }
                 $product= Product::create([
                     'name' => $atts['name'] ?? $atts['s_name'],
@@ -138,7 +145,7 @@ class ProductController extends Controller
             'stock_alert'=>'nullable|integer|min:0',
             'delivery_option' => 'nullable|string',
             'tax_rate' => 'nullable|numeric|min:0',
-            'discount_rate' => 'nullable|numeric|min:0',
+            'discount_price' => 'nullable|numeric|min:0',
         ]);
         try {
             DB::transaction(function () use ($atts, &$product) {
@@ -156,6 +163,12 @@ class ProductController extends Controller
                         $category_id=$category->id;
                         $atts['category_id'] = $category_id;
                     }
+                }
+                if (isset($atts['discount_price'])) {
+                    if($atts['discount_price'] > $atts['price']){
+                        $atts['discount_rate']=0;
+                    }else{
+                    $atts['discount_rate'] = ($atts['discount_price'] * 100) / $atts['price'];}
                 }
                 $product->update([
                     'name' => $atts['name'] ?? $product->name,
