@@ -95,8 +95,8 @@ class ProductController extends Controller
                 }
                 if(!isset($atts['sku'])){
                 $product->sku = 'SKU-' . date('Y').date('M').$product->id;
-                $product->save();
                 }
+                $product->save();
                 return $product;
             });
             if ($request->hasFile('images')) {
