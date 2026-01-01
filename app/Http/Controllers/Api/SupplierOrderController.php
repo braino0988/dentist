@@ -38,6 +38,7 @@ class SupplierOrderController extends Controller
             'products' => 'nullable|array|min:1',
             'products.*.id' => 'required|exists:products,id',
             'products.*.quantity' => 'required|integer|min:1',
+            'products.*.tax_rate'=> 'nullable|numeric|min:0|max:100'
         ]);
         try {
             $order = DB::transaction(function () use ($request, $atts, &$order) {
@@ -69,11 +70,11 @@ class SupplierOrderController extends Controller
                     // }
                     $quantity = $productData['quantity'];
                     $lineSubtotal = $product->cost * $quantity;
-                    $lineTax = $lineSubtotal * ($product->tax_rate ?? 0 / 100);
+                    $lineTax = $lineSubtotal * (($productData['tax_rate'] ?? 0) / 100);
                     $order->products()->attach($product->id, [
                         'quantity' => $quantity,
                         'unit_cost_price' => $product->cost,
-                        'tax_rate' => $product->tax_rate ?? 0,
+                        'tax_rate' => $productData['tax_rate'] ?? 0,
                         // 'discount_amount' => $discountAmount,
                         'subtotal' => $lineSubtotal,
                         'tax_amount' => $lineTax,
@@ -95,7 +96,10 @@ class SupplierOrderController extends Controller
     public function destroy($id)
     {
         $this->authorize('supplierOrder', User::class);
-        $order = SupplierOrder::findOrFail($id);
+        $order = SupplierOrder::find($id);
+        if(!$order){
+            return response()->json(['message' => 'Order not found'], 404);
+        }
         $order->products()->detach();
         $order->delete();
         return response()->json(['message' => 'Order deleted successfully'], 200);
@@ -104,7 +108,7 @@ class SupplierOrderController extends Controller
     {
         //add the policy later on
         $this->authorize('supplierOrder', User::class);
-        $order = SupplierOrder::findOrFail($id);
+        $order = SupplierOrder::find($id);
         if (!$order) {
             return response()->json(['message' => 'Order not found'], 404);
         }
@@ -115,21 +119,17 @@ class SupplierOrderController extends Controller
             DB::transaction(function () use ($order) {
                 foreach ($order->products as $productData) {
                     $product = Product::findOrFail($productData->id);
-                    if (!$product) {
-                        return response()->json(['message' => 'Product not found'], 404);
-                    }
                     $projectedQty = $product->stock_quantity + $productData['pivot']->quantity;
                     if ($projectedQty < 0) {
                         $product->status = 'alertstock';
                     } elseif ($projectedQty <= 0) {
                         $product->status = 'outofstock';
-                    } elseif ($projectedQty < 10) {
+                    } elseif ($projectedQty < $product->stock_alert) {
                         $product->status = 'lowstock';
                     } else {
                         $product->status = 'instock';
                     }
                     $product->stock_quantity = $projectedQty;
-                    $productsstatus[$product->name] = $product->status;
                     $product->save();
                     StockMovment::create([
                         'product_id' => $product->id,
@@ -152,7 +152,7 @@ class SupplierOrderController extends Controller
     public function cancel($id)
     {
         $this->authorize('supplierOrder', User::class);
-        $order = SupplierOrder::findOrFail($id);
+        $order = SupplierOrder::find($id);
         if (!$order) {
             return response()->json(['message' => 'Order not found'], 404);
         }
@@ -160,21 +160,17 @@ class SupplierOrderController extends Controller
             DB::transaction(function () use ($order) {
                 foreach ($order->products as $productData) {
                     $product = Product::findOrFail($productData->id);
-                    if (!$product) {
-                        return response()->json(['message' => 'Product not found'], 404);
-                    }
                     $projectedQty = $product->stock_quantity - $productData['pivot']->quantity;
                     if ($projectedQty < 0) {
                         $product->status = 'alertstock';
                     } elseif ($projectedQty <= 0) {
                         $product->status = 'outofstock';
-                    } elseif ($projectedQty < 10) {
+                    } elseif ($projectedQty < $product->stock_alert) {
                         $product->status = 'lowstock';
                     } else {
                         $product->status = 'instock';
                     }
                     $product->stock_quantity = $projectedQty;
-                    $productsstatus[$product->name] = $product->status;
                     $product->save();
                     StockMovment::create([
                         'product_id' => $product->id,
@@ -200,9 +196,16 @@ class SupplierOrderController extends Controller
         $atts = $request->validate([
             'product_id' => 'required|exists:products,id',
             'quantity' => 'required|integer|min:1',
+            'tax_rate'=> 'nullable|numeric|min:0|max|100'
         ]);
-        $order = SupplierOrder::findOrFail($id);
-        $product = Product::findOrFail($atts['product_id']);
+        $order = SupplierOrder::find($id);
+        if(!$order){
+            return response()->json(['message' => 'Order not found'], 404);
+        }
+        $product = Product::find($atts['product_id']);
+        if(!$product){
+            return response()->json(['message' => 'Product not found'], 404);
+        }
         if ($order && $product) {
             // $discountAmount = 0;
             // if ($product->discount_rate) {
@@ -210,11 +213,11 @@ class SupplierOrderController extends Controller
             // }
             $quantity = $atts['quantity'];
             $lineSubtotal = $product->cost * $quantity;
-            $lineTax = $lineSubtotal * ($product->tax_rate ?? 0 / 100);
+            $lineTax = $lineSubtotal * (($atts['tax_rate'] ?? 0) / 100);
             $order->products()->attach($product->id, [
                 'quantity' => $quantity,
                 'unit_cost_price' => $product->cost,
-                'tax_rate' => $product->tax_rate ?? 0,
+                'tax_rate' => $atts['tax_rate'] ?? 0,
                 // 'discount_amount' => $discountAmount,
                 'subtotal' => $lineSubtotal,
                 'tax_amount' => $lineTax,
@@ -237,8 +240,14 @@ class SupplierOrderController extends Controller
         $atts = $request->validate([
             'product_id' => 'required|exists:products,id',
         ]);
-        $order = SupplierOrder::findOrFail($id);
-        $product = Product::findOrFail($atts['product_id']);
+        $order = SupplierOrder::find($id);
+        if(!$order){
+            return response()->json(['message' => 'Order not found'], 404);
+        }
+        $product = Product::find($atts['product_id']);
+        if(!$product){
+            return response()->json(['message' => 'Product not found'], 404);
+        }
         if ($order && $product) {
             $pivotData = $order->products()->where('product_id', $product->id)->first()->pivot;
             $order->products()->detach($product->id);

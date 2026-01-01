@@ -37,7 +37,6 @@ return new class extends Migration
             $table->decimal('tax_rate', 5, 2)->min(0)->max(100.0)->default(0);   // e.g. 25.00
             $table->decimal('discount_amount',8,2)->default(0);
             $table->decimal('tax_amount', 10, 2)->default(0); // calculated per line
-            $table->string('status')->default('');
             $table->timestamps();
         });
     }

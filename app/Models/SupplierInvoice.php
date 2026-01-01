@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class SupplierInvoice extends Model
 {
+    protected $guarded = [];
+
     public function supplier(){
         return $this->belongsTo(Supplier::class);
     }
