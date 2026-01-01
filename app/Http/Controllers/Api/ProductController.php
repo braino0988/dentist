@@ -40,7 +40,7 @@ class ProductController extends Controller
             'cost'=> 'required|numeric|min:0',
             'category' => 'required|string',
             'stock_quantity' => 'nullable|integer|min:0',
-            'stock_alert'=>'nullable|integer|min:0',
+            'low_stock_alert_threshold'=>'nullable|integer|min:0',
             'delivery_option' => 'nullable|string',
             'tax_rate' => 'nullable|numeric|max:100|min:0',
             'product_rate' => 'nullable|numeric|max:5|min:0',
@@ -66,6 +66,7 @@ class ProductController extends Controller
                         $atts['discount_price'] = 0;
                     }
                 }
+                $atts['stock_alert']=$atts['low_stock_alert_threshold'] ?? 10;
                 $product= Product::create([
                     'name' => $atts['name'] ?? $atts['s_name'],
                     's_name' => $atts['s_name'] ?? $atts['name'],
@@ -140,7 +141,7 @@ class ProductController extends Controller
             'cost'=> 'nullable|numeric|min:0',
             'category' => 'nullable|string',
             'stock_quantity' => 'nullable|integer|min:0',
-            'stock_alert'=>'nullable|integer|min:0',
+            'low_stock_alert_threshold'=>'nullable|integer|min:0',
             'delivery_option' => 'nullable|string',
             'tax_rate' => 'nullable|numeric|min:0',
             'discount_price' => 'nullable|numeric|min:0',
@@ -167,6 +168,7 @@ class ProductController extends Controller
                         $atts['discount_price'] = 0;
                     }
                 }
+                $atts['stock_alert']=$atts['low_stock_alert_threshold'] ?? $product->stock_alert;
                 $product->update([
                     'name' => $atts['name'] ?? $product->name,
                     's_name' => $atts['s_name'] ?? $product->s_name,
