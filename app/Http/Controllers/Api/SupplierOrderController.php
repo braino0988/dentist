@@ -25,7 +25,7 @@ class SupplierOrderController extends Controller
         $this->authorize('supplierOrder', User::class);
         $order = SupplierOrder::findOrFail($id);
         $relatedProducts = $order->products;
-        return response()->json(['data' => $relatedProducts], 200);
+        return response()->json(['order'=>SupplierOrderResource::make($order),'related_products' => $relatedProducts], 200);
     }
     public function store(Request $request)
     {
@@ -36,7 +36,7 @@ class SupplierOrderController extends Controller
             'payment_method' => 'nullable|string|max:255',
             'notes' => 'string|nullable',
             'products' => 'nullable|array|min:1',
-            'products.*.id' => 'required|exists:products,id',
+            'products.*.id' => 'required|exists:products,id|distinct',
             'products.*.quantity' => 'required|integer|min:1',
             'products.*.tax_rate'=> 'nullable|numeric|min:0|max:100'
         ]);
@@ -156,6 +156,9 @@ class SupplierOrderController extends Controller
         if (!$order) {
             return response()->json(['message' => 'Order not found'], 404);
         }
+        if($order->status !== 'confirmed'){
+            return response()->json(['message' => 'Only confirmed orders can be canceled'], 400);
+        }
         try {
             DB::transaction(function () use ($order) {
                 foreach ($order->products as $productData) {
@@ -196,11 +199,17 @@ class SupplierOrderController extends Controller
         $atts = $request->validate([
             'product_id' => 'required|exists:products,id',
             'quantity' => 'required|integer|min:1',
-            'tax_rate'=> 'nullable|numeric|min:0|max|100'
+            'tax_rate'=> 'nullable|numeric|min:0|max:100'
         ]);
         $order = SupplierOrder::find($id);
         if(!$order){
             return response()->json(['message' => 'Order not found'], 404);
+        }
+        if($order->status =='confirmed'){
+            return response()->json(['message' => 'Cannot modify confirmed order'], 400);
+        }
+        if ($order->products()->where('product_id', $atts['product_id'])->exists()) {
+            return response()->json(['error' => 'This product is already included in the order if you want to modify the quantity you can remove the product cart and add another one.'], 422);
         }
         $product = Product::find($atts['product_id']);
         if(!$product){
@@ -243,6 +252,9 @@ class SupplierOrderController extends Controller
         $order = SupplierOrder::find($id);
         if(!$order){
             return response()->json(['message' => 'Order not found'], 404);
+        }
+        if ($order->status == 'confirmed') {
+            return response()->json(['message' => 'Cannot modify confirmed order'], 400);
         }
         $product = Product::find($atts['product_id']);
         if(!$product){
@@ -296,7 +308,7 @@ class SupplierOrderController extends Controller
                 $order->notes = $atts['notes'];
             }
             $order->save();
-            return response()->json(['message' => 'Order updated successfully'], 200);
+            return response()->json(['message' => 'Order updated successfully','order'=>SupplierOrderResource::make($order)], 200);
         } else {
             return response()->json(['message' => 'Order not found'], 404);
         }

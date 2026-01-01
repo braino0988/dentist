@@ -36,7 +36,7 @@ class OrderController extends Controller
             'payment_method' => 'nullable|string|max:255',
             'notes' => 'string|nullable',
             'products' => 'nullable|array|min:1',
-            'products.*.id' => 'required|exists:products,id',
+            'products.*.id' => 'required|exists:products,id|distinct',
             'products.*.quantity' => 'required|integer|min:1',
         ]);
         try {
@@ -159,6 +159,9 @@ class OrderController extends Controller
         if (!$order) {
             return response()->json(['message' => 'Order not found'], 404);
         }
+        if ($order->status !== 'confirmed') {
+            return response()->json(['message' => 'Only confirmed orders can be canceled'], 400);
+        }
         try {
             DB::transaction(function () use ($order) {
                 foreach ($order->products as $productData) {
@@ -206,8 +209,20 @@ class OrderController extends Controller
             'product_id' => 'required|exists:products,id',
             'quantity' => 'required|integer|min:1',
         ]);
-        $order = Order::findOrFail($id);
-        $product = Product::findOrFail($atts['product_id']);
+        $order = Order::find($id);
+        if(!$order){
+            return response()->json(['message'=>'Order not found'],404);
+        }
+        if($order->status =='confirmed'){
+            return response()->json(['message'=>'confirmed orders cannot be modified'],400);
+        }
+        if ($order->products()->where('product_id', $atts['product_id'])->exists()) {
+            return response()->json(['error' => 'This product is already included in the order if you want to modify the quantity you can remove the product cart and add another one.'], 422);
+        }
+        $product = Product::find($atts['product_id']);
+        if (!$product) {
+            return response()->json(['message' => 'Product not found'], 404);
+        }
         if ($order && $product) {
             $quantity = $atts['quantity'];
             $lineSubtotal = $product->price * $quantity;
@@ -242,8 +257,17 @@ class OrderController extends Controller
         $atts = $request->validate([
             'product_id' => 'required|exists:products,id',
         ]);
-        $order = Order::findOrFail($id);
-        $product = Product::findOrFail($atts['product_id']);
+        $order = Order::find($id);
+        if(!$order){
+            return response()->json(['message'=>'Order not found'],404);
+        }
+        if ($order->status == 'confirmed') {
+            return response()->json(['message' => 'confirmed orders cannot be modified'], 400);
+        }
+        $product = Product::find($atts['product_id']);
+        if (!$product) {
+            return response()->json(['message' => 'Product not found'], 404);
+        }
         if ($order && $product) {
             $pivotData = $order->products()->where('product_id', $product->id)->first()->pivot;
             $order->products()->detach($product->id);
@@ -280,7 +304,10 @@ class OrderController extends Controller
             'payment_method' => 'nullable|string|max:255',
             'notes' => 'string|nullable',
         ]);
-        $order = Order::findOrFail($id);
+        $order = Order::find($id);
+        if(!$order){
+            return response()->json(['message'=>'Order not found'],404);
+        }
         if ($order) {
             if (isset($atts['currency'])) {
                 $order->currency = $atts['currency'];

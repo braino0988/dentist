@@ -55,7 +55,7 @@ Route::get('/supplierorders/{id}',[App\Http\Controllers\Api\SupplierOrderControl
 Route::post('/createsupplierorder',[App\Http\Controllers\Api\SupplierOrderController::class,'store'])->middleware(['auth:sanctum','employee']);
 Route::post('/confirmsupplierorder/{id}',[App\Http\Controllers\Api\SupplierOrderController::class,'confirm'])->middleware(['auth:sanctum','employee']);
 Route::post('/cancelsupplierorder/{id}',[App\Http\Controllers\Api\SupplierOrderController::class,'cancel'])->middleware(['auth:sanctum','employee']);
-Route::post('/deletesupplierorder/{id}',[App\Http\Controllers\Api\SupplierOrderController::class,'destroy'])->middleware(['auth:sanctum','employee']);
+// Route::post('/deletesupplierorder/{id}',[App\Http\Controllers\Api\SupplierOrderController::class,'destroy'])->middleware(['auth:sanctum','employee']);
 Route::post('/additemtosupplierorder/{id}',[App\Http\Controllers\Api\SupplierOrderController::class,'addItem'])->middleware(['auth:sanctum','employee']);
 Route::post('/removeitemfromsupplierorder/{id}',[App\Http\Controllers\Api\SupplierOrderController::class,'removeItem'])->middleware(['auth:sanctum','employee']);
 Route::post('/updatesupplierorderheaders/{id}',[App\Http\Controllers\Api\SupplierOrderController::class,'update'])->middleware(['auth:sanctum','employee']);
